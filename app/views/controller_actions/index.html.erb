@@ -1,0 +1,176 @@
+<%- content_for :page_scripts do -%>
+var descriptions = <%= descriptions %>;
+
+function show_description() {
+  var grouping = $('grouping').value;
+  var resource = $('resource').value;
+  var gfunction = $('grouping_function').value;
+
+  if (grouping == 'request' || resource == 'requests') {
+    $('function-widget').hide();
+    $('description').innerHTML = descriptions[grouping][resource];
+  }
+  else {
+    $('description').innerHTML = descriptions[grouping][resource][gfunction];
+    $('function-widget').show();
+  }
+};
+
+Event.observe(window, 'load', function() {show_description()});
+<%- end -%>
+
+<div id='left' class='clear-left'>
+  <div id='filter'>
+    <%= form_tag({:action => :index}, :method => :get, :id => 'filter-form') do -%>
+      <fieldset>
+        <legend>LogJam for Rails</legend>
+        <p class='filter-widget'>
+          <%= label :filter, 'date' %><br />
+          <%= select_tag 'starts_at', options_for_select(ControllerAction.log_data_dates, @starts_at.to_s(:db)[0..9]) %>
+        </p>
+        <p class='filter-widget'>
+          <%= label :filter, 'start_time' %><br />
+          <%= select_tag 'start_hour', options_for_select((0..23).map{|h| ["#{h}:00", h.to_s]}, params[:start_hour]) %>
+        </p>
+        <p class='filter-widget'>
+          <%= label :filter, 'end_time' %><br />
+          <%= select_tag 'end_hour', options_for_select((1..24).map{|h| ["#{h}:00", h.to_s]}, params[:end_hour]) %>
+        </p>
+        <p class='filter-widget'>
+          <%= label :filter, 'server' %><br />
+          <%= select_tag 'server', options_for_select([''] + @hosts, params['server']) %>
+        </p>
+        <p class='filter-widget'>
+          <%= label :filter, 'response' %><br />
+          <%= select_tag 'response', options_for_select([''] + @response_codes, params['response']) %> <br />
+        </p>
+        <p class='filter-widget-last'>
+          <%= label :filter, 'plot timeslice' %><br />
+          <%= select_tag 'interval', options_for_select(ControllerAction.durations.map{|i| [pluralize(i, 'minute'), i]}, params[:interval]) %>
+        </p>
+        
+        <p class='clear-left'></p>
+
+        <%- if ControllerAction.column_names.include?('user_id') -%>
+          <p class='filter-widget'>
+            <%= label :filter, 'user id' %><br />
+            <%= text_field_tag 'user_id', params['user_id'] %>
+          </p>
+        <%- end -%>
+        <p class='filter-widget'>
+          <%= label :filter, 'page name' %><br />
+          <%= text_field_with_auto_complete :controller_action, :page, {:value => @page, :size => 40} %>
+        </p>
+        <%- if ControllerAction.column_names.include?('heap_growth') -%>
+          <p class='filter-widget-last'>
+            <%= label :filter, 'heap growth only' %><br />
+            <%= check_box_tag 'heap_growth_only', "1", params['heap_growth_only']=="1" %>
+          </p>
+        <%- end -%>
+
+        <p class='clear-left'></p>
+
+        <p class='filter-widget'>
+          <%= label :filter, 'Show' %><br />
+          <%= select_tag 'grouping', options_for_select(Resource.grouping_options, params['grouping']),
+              :onchange => "show_description()" %>
+        </p>
+        <p class='filter-widget' id='resource-widget'>
+          <%= label :filter, 'with' %><br />
+          <%= select_tag 'resource', options_for_select(Resource.resource_options, params['resource']), 
+              :onchange => "show_description()" %>
+        </p>
+        <p class='filter-widget' id='function-widget'>
+          <%= label :filter, 'sorted by' %><br />
+          <%= select_tag 'grouping_function', options_for_select(Resource.grouping_functions, params['grouping_function']),
+              :onchange => "show_description()" %>
+        </p>
+        <p class='filter-float-right'>
+          <br />
+          <%= submit_tag 'GO', :class => 'submit' %>
+        </p>
+        
+        <p class='clear-left'></p>
+
+        <p class='filter-widget' id='description'></p>
+      </fieldset>
+      <% end -%>
+  </div>
+
+  <% if @dataset.empty? -%>
+    <p class='warning'>Dataset is empty.</p>
+  <% else -%>
+    <div id='graph-counts' class='clear-left'>
+      <p class='stats'>
+        <%= @dataset.starts_at.strftime('%d-%b-%Y') %>: showing
+        <%= number_with_delimiter @dataset.count_requests %> of <%= number_with_delimiter @klazz.count %> requests and
+        <%= number_with_delimiter @dataset.count_distinct_users %> of <%= number_with_delimiter @klazz.count_distinct_users %> users
+      </p>
+      <%= link_to image_tag(@dataset.png_file, :alt => 'enlarge plot', :title => 'enlarge plot'), {:params => params.merge(:action => 'enlarged_plot')} %>
+    </div>
+
+    <%- if [:time, :memory].include? @plot_kind -%>
+      <table class='stats clear-left' id='graph-stats'>
+        <tr>
+          <th></th>
+          <th>avg</th>
+          <th>stddev</th>
+        </tr>
+      <% @attributes.each do |attr| -%>
+        <tr>
+          <td><%= h(attr.to_s.sub(/_time$/, '')) %></td>
+          <% if attr =~ /_time/ %>
+            <td class='number'><%= time_number(@dataset.statistics(@plot_kind)["avg_#{attr}"].to_f) %></td>
+            <td class='number'><%= time_number(@dataset.statistics(@plot_kind)["std_#{attr}"].to_f) %></td>
+          <% else %>
+            <td class='number'><%= memory_number(@dataset.statistics(@plot_kind)["avg_#{attr}"].to_f) %></td>
+            <td class='number'><%= memory_number(@dataset.statistics(@plot_kind)["std_#{attr}"].to_f) %></td>
+          <% end %>
+        </tr>
+      <% end -%>
+      </table>
+      <div id='distribution-plot'>
+        <%= button_to "distribution plot and statistics", 
+                    {:params => params.merge(:action => distribution_kind(@dataset))} %>
+      </div>
+    <%- end -%>
+    
+  <% end -%>
+  <div class='clear-left'></div>
+</div>
+
+<% unless @dataset.empty? -%>
+  <div id='column-right'>
+  <div id='pagetimes'>
+    <br />
+    <h3><%= @dataset.description %></h3>
+    <table class='full_stats'>
+      <tr>
+        <% if @dataset.grouping? -%>
+          <th><%= @dataset.grouping %></th>
+          <th>requests</th>
+          <% unless @dataset.resource == 'requests' -%>
+            <% unless @dataset.grouping_function == :avg -%>
+              <th>avg<br/><%= @dataset.resource.gsub('_', ' ') %></th>
+            <% end -%>
+            <th>stddev<br/><%= @dataset.resource.gsub('_', ' ') %></th>
+            <th><%= @dataset.grouping_function %><br/><%= @dataset.resource.gsub('_', ' ') %></th>
+            <% if @dataset.accumulates_time? -%>
+              <th>% of overall<br/><%= @dataset.resource.gsub('_', '&nbsp;') %></th>
+              <% unless @dataset.resource.to_sym == :total_time -%>
+                <th>% of total time</th>
+              <% end -%>
+            <% end -%>
+          <% end -%>
+        <% else -%>
+          <th>user</th>
+          <th>page</th>
+          <th><%= h @dataset.resource %></th>
+        <% end -%>
+      </tr>
+      <%= render :partial => 'statistics' %>
+    </table>
+    <p class='query'><%= @dataset.the_query %></p>
+  </div>
+  </div>
+<% end -%>

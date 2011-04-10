@@ -1,0 +1,179 @@
+body { background-color: #fff; color: #333; }
+
+body, p, ol, ul, td {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size:   12px;
+  line-height: 18px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  font-size: 11px;
+}
+
+a { color: #000; }
+a:hover { color: #000; background-color:#fff; }
+a { text-decoration: none; }
+
+label {
+font-weight: bold;
+font-size: 80%;
+display: block;
+float: left;
+clear: left;
+}
+
+form {margin-bottom: 20px;}
+
+input, select {
+  float: left;
+  clear: left;
+  margin-bottom: 5px;
+}
+
+.submit {
+  margin-top: 10px;
+  width: 60px;
+}
+
+.clear-left {clear:left; float:left;}
+.filter-widget {float:left; padding-right: 20px;}
+.filter-widget-last, .float-left {float:left;}
+.filter-float-right {float:right; padding-right: 20px;}
+#description.filter-widget {font-style: italic; margin: 0 0 0 5px; font-size: 90%;}
+
+#filter ul li {font-size: 65%; padding: 0px;}
+#filter object {display:block; height:360px; width:540px;}
+#request-time-distribution object {display:block; height:600px; width:800px;}
+#enlarged-plot object {display:block; height:600px; width:1000px;}
+
+img {
+  border: 0 none;
+}
+
+fieldset {
+border: 1px solid #CCA383;
+width: 610px;
+padding: 3px;
+}
+
+fieldset p {
+  margin-bottom: 0;
+}
+
+fieldset legend {
+background: #CCA383;
+padding: 3px;
+font-weight: bold;
+font-size: 120%;
+}
+
+div#filter, div#column-right {
+  float: left;
+}
+
+div#column-right {width: 700px;}
+
+div#pagetimes {
+  margin: -20px 0 0 20px;
+}
+
+p.query {
+  font-size: 90%;
+  width: 640px;
+}
+
+.stats {
+  margin: 2px 0 2px 80px;
+}
+
+.full_stats, p.query, div#pagetimes h3 {
+  margin-left: 0px;
+}
+
+.full_stats th {
+  margin: 0;
+  padding: 2px;
+  background: #CCA383;
+}
+
+tr.full_stats:hover {
+  background: #CCA383;
+}
+
+tr.full_stats a {
+  padding: 0 2px;
+}
+
+td.group-thing a {font-size: 90%;}
+td.group-thing {max-width: 32em; overflow: hidden;}
+
+td {padding: 0 8px;}
+td.number {text-align: right;}
+
+.stats th { font-size: 12px; }
+.stats td { font-size: 12px; padding: 0 8px; }
+.table-heading { font-weight: bold; padding-top: 10px; }
+
+.enlarge-plot {
+  position: absolute;
+  top: 340px;
+  left: 20;
+  height: 360px;
+  width: 450px;
+  text-indent: -200em;
+}
+
+.enlarge-plot:hover {
+  background: transparent;
+}
+
+#quintile-stats {float:left; margin-top: 100px;}
+#graph-stats td {font-size: 90%; line-height: 100%;}
+#graph-stats th { font-size: 90%; }
+#graph-counts {font-size: 90%; margin-bottom: 10px;}
+#graph-counts p {font-weight: bold;}
+#distribution-plot {position: relative; top: 20px; left: 40px;}
+#distribution-plot form div input {clear:none;}
+
+.warning {
+  font-size: 200%;
+  color: blue;
+}
+
+.fieldWithErrors {
+  padding: 2px;
+  background-color: red;
+  display: table;
+}
+
+#errorExplanation {
+  width: 400px;
+  border: 2px solid red;
+  padding: 7px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  background-color: #f0f0f0;
+}
+
+#errorExplanation h2 {
+  text-align: left;
+  font-weight: bold;
+  padding: 5px 5px 5px 15px;
+  font-size: 12px;
+  margin: -7px;
+  background-color: #c00;
+  color: #fff;
+}
+
+#errorExplanation p {
+  color: #333;
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+#errorExplanation ul li {
+  font-size: 12px;
+  list-style: square;
+}

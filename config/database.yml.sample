@@ -1,0 +1,26 @@
+development:
+<% if RUBY_PLATFORM == 'java' %>
+  adapter: jdbcmysql
+<% else %>
+  adapter: mysql
+<% end %>
+  username:
+  password:
+  database: log_jam_dev
+  pool: 5
+  timeout: 5000
+  reconnect: true
+
+test:
+<% if RUBY_PLATFORM == 'java' %>
+  adapter: jdbcmysql
+<% else %>
+  adapter: mysql
+<% end %>
+  username:
+  password:
+  database: log_jam_test
+  pool: 5
+  timeout: 5000
+  reconnect: true
+
